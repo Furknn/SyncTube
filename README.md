@@ -63,6 +63,22 @@ And install `ffmpeg/ffprobe` on your server system. Default cache size is 3.0 Gi
 ## Configuration
 It just works, but you can also check [user/ folder](/user/README.md) for server settings and additional customization.
 
+## Voice chat
+This fork adds a call button to the chat header: everyone who joins can talk while watching
+(WebRTC audio with echo cancellation, per-user volume, mute, speaking indicator).
+
+- `voice/` is a tiny WebSocket signaling server (port 4300). Audio goes peer-to-peer or through TURN, never through it.
+- The page connects to `wss://<same host>/voice`, so serve SyncTube and the voice server under one origin, e.g.:
+  ```shell
+  tailscale serve --bg --https=8443 http://127.0.0.1:4200
+  tailscale serve --bg --https=8443 --set-path /voice http://127.0.0.1:4300
+  ```
+  or set `window.SYNCTUBE_VOICE_URL` in `user/res/js/custom.js`.
+- Microphone access needs HTTPS (or `localhost`).
+- For users on different networks (CGNAT, strict NAT), run the bundled coturn relay:
+  copy `.env.example` to `.env`, set `TURN_IP` to an address all participants can reach, then
+  `docker compose --profile turn up -d`.
+
 ## How to use
 - Login with any nickname
 - Add your video url with "plus" button below (youtube or direct link to mp4 for example)

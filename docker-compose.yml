@@ -1,11 +1,50 @@
-# Run this as follows: 'docker compose up'  (keep running in terminal session, exist via [STRG] + [C]) 
-#                   or 'docker compose up -d' (keep running in background)
-version: "3"
+# Run: copy .env.example to .env, edit it, then `docker compose up -d`
+# With TURN relay (recommended for voice chat across networks):
+#   docker compose --profile turn up -d
 services:
   synctube:
-     build: .
-    #image: synctube
-     ports:
-       - "4200:4200"
-     volumes:
-       - "${PWD}/user:/app/user"
+    build: .
+    image: synctube:local
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDR:-0.0.0.0}:4200:4200"
+    volumes:
+      - ./user:/app/user
+
+  # Voice chat signaling (WebSocket). The page connects to <same origin>/voice,
+  # so put both behind one reverse proxy (see README "Voice chat").
+  voice:
+    build: ./voice
+    image: synctube-voice:local
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDR:-0.0.0.0}:4300:4300"
+    environment:
+      TURN_URLS: "${TURN_URLS:-}"
+      TURN_USER: "${TURN_USER:-}"
+      TURN_PASS: "${TURN_PASS:-}"
+      STUN_URLS: "${STUN_URLS:-}"
+
+  # Optional TURN relay so voice works even behind CGNAT / strict NAT.
+  coturn:
+    image: coturn/coturn:4.7
+    profiles: ["turn"]
+    restart: unless-stopped
+    network_mode: host
+    command:
+      - -n
+      - --listening-ip=${TURN_IP}
+      - --relay-ip=${TURN_IP}
+      - --listening-port=3478
+      - --min-port=49160
+      - --max-port=49200
+      - --lt-cred-mech
+      - --user=${TURN_USER}:${TURN_PASS}
+      - --realm=synctube
+      - --fingerprint
+      - --no-tls
+      - --no-dtls
+      - --no-cli
+      - --no-multicast-peers
+      - --log-file=stdout
+      - --simple-log

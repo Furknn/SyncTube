@@ -1,0 +1,80 @@
+/* Voice chat */
+.voice-btn.active {
+  color: var(--success);
+}
+
+.voice-btn.muted {
+  color: var(--error);
+}
+
+.voice-panel {
+  border-bottom: solid var(--border) 1px;
+  padding: .4rem .6rem;
+  font-size: .9rem;
+}
+
+.voice-status {
+  color: var(--warning);
+  padding-bottom: .3rem;
+}
+
+.voice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.voice-user,
+.voice-empty {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .2rem 0;
+  color: var(--foreground);
+}
+
+.voice-empty {
+  color: var(--midground);
+  font-style: italic;
+}
+
+.voice-dot {
+  flex: none;
+  width: .6rem;
+  height: .6rem;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background .1s, box-shadow .1s;
+}
+
+.voice-user.speaking .voice-dot {
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--leader-hint);
+}
+
+.voice-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voice-name small {
+  color: var(--midground);
+}
+
+.voice-name .voice-failed {
+  color: var(--error);
+}
+
+.voice-muted-icon {
+  flex: none;
+  color: var(--error);
+}
+
+.voice-volume {
+  flex: none;
+  width: 5rem;
+  accent-color: var(--accent);
+}

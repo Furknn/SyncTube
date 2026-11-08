@@ -8,3 +8,5 @@
 /user/users.json
 /user/cookies.txt
 /user/res/
+/.env
+/voice/node_modules
